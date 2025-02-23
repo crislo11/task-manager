@@ -1,17 +1,16 @@
 "use client";
 
-import React from "react";
+import Link from "next/link";
+import { Card } from "./ui/card";
+import { Button } from "./ui/button";
+import { Layout, MoreVertical, Pencil, Trash, Users2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Layout, MoreVertical, Pencil, Trash, Users2 } from "lucide-react";
-import { Project } from "@/types";
-import { Card } from "./ui/card";
-import Link from "next/link";
-import { Button } from "./ui/button";
+import type { Project } from "@/types";
 
 interface ProjectCardProps {
   project: Project | null;
