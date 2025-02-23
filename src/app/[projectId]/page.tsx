@@ -185,11 +185,11 @@ export default function ProjectBoard({ params }: { params: ProjectParams }) {
   };
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return <div role="status">Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <div role="alert">Error: {error.message}</div>;
   }
 
   const columns = [
@@ -202,11 +202,17 @@ export default function ProjectBoard({ params }: { params: ProjectParams }) {
     <div className="min-h-screen bg-background py-4 px-8">
       <div className="mb-6 space-y-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Project Board</h1>
+          <h1 className="text-2xl font-bold" tabIndex={0}>
+            Project Board
+          </h1>
           <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <Button onClick={() => handleOpenDialog()}>
-              <Plus className="mr-2 h-4 w-4" />
+            <ThemeToggle aria-label="Toggle theme" />
+            <Button
+              onClick={() => handleOpenDialog()}
+              aria-label="Add Task"
+              tabIndex={0}
+            >
+              <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
               Add Task
             </Button>
           </div>
@@ -216,8 +222,13 @@ export default function ProjectBoard({ params }: { params: ProjectParams }) {
           <FilterSheet
             priorityFilters={priorityFilters}
             setPriorityFilters={setPriorityFilters}
+            aria-label="Filter tasks by priority"
           />
-          <SortSelect sortBy={sortBy} setSortBy={setSortBy} />
+          <SortSelect
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            aria-label="Sort tasks by due date"
+          />
         </div>
       </div>
 
@@ -228,6 +239,7 @@ export default function ProjectBoard({ params }: { params: ProjectParams }) {
         onTaskFormChange={handleTaskFormChange}
         onSave={handleSaveTask}
         isEditing={!!editingTask}
+        aria-label={editingTask ? "Edit Task" : "Add Task"}
       />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -237,10 +249,19 @@ export default function ProjectBoard({ params }: { params: ProjectParams }) {
             className="rounded-lg border bg-card p-4"
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(column.id as Task["status"])}
+            aria-label={`${column.title} column`}
+            tabIndex={0}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-semibold">{column.title}</h2>
-              <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium">
+              <h2 className="font-semibold" tabIndex={0}>
+                {column.title}
+              </h2>
+              <span
+                className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium"
+                aria-label={`Number of tasks in ${column.title}: ${
+                  filteredAndSortedTasks(column.tasks).length
+                }`}
+              >
                 {filteredAndSortedTasks(column.tasks).length}
               </span>
             </div>
@@ -252,6 +273,7 @@ export default function ProjectBoard({ params }: { params: ProjectParams }) {
                   onDragStart={handleDragStart}
                   onEdit={handleOpenDialog}
                   onDelete={handleOpenDeleteDialog}
+                  aria-label={`Task: ${task.title}. Press Enter to edit or Delete to remove.`}
                 />
               ))}
             </div>
@@ -263,6 +285,7 @@ export default function ProjectBoard({ params }: { params: ProjectParams }) {
         taskToDelete={taskToDelete}
         onOpenChange={(open) => !open && setTaskToDelete(null)}
         onDelete={handleDeleteTask}
+        aria-label="Delete Task Confirmation"
       />
     </div>
   );
