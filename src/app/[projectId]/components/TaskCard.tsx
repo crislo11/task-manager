@@ -1,7 +1,6 @@
 "use client";
 
 import { Calendar, MoreVertical, Pencil, Trash } from "lucide-react";
-import { format } from "date-fns";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,20 +9,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  dueDate: Date | null;
-  priority: "low" | "medium" | "high";
-}
+import { formatDate } from "@/utils/date";
+import { Timestamp } from "firebase/firestore";
+import type { Maybe, Task } from "@/types";
 
 interface TaskCardProps {
-  task: Task;
-  onDragStart: (task: Task) => void;
-  onEdit: (task: Task) => void;
-  onDelete: (task: Task) => void;
+  task: Maybe<Task>;
+  onDragStart: (task: Maybe<Task>) => void;
+  onEdit: (task: Maybe<Task>) => void;
+  onDelete: (task: Maybe<Task>) => void;
 }
 
 export function TaskCard({
@@ -32,6 +26,8 @@ export function TaskCard({
   onEdit,
   onDelete,
 }: TaskCardProps) {
+  if (!task) return null;
+
   return (
     <Card
       key={task.id}
@@ -81,7 +77,7 @@ export function TaskCard({
         {task.dueDate && (
           <div className="mt-4 flex items-center text-sm text-muted-foreground">
             <Calendar className="mr-2 h-4 w-4" />
-            {format(new Date(task.dueDate), "PPP")}
+            {formatDate(task?.dueDate as unknown as Maybe<Timestamp>)}
           </div>
         )}
       </div>

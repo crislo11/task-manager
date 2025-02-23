@@ -10,12 +10,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Project } from "@/types";
+import type { Maybe, Project } from "@/types";
+import { formatDate } from "@/utils/date";
 
 interface ProjectCardProps {
-  project: Project | null;
-  onEdit: (project: Project | null) => void;
-  onDelete: (project: Project | null) => void;
+  project: Maybe<Project>;
+  onEdit: (project: Maybe<Project>) => void;
+  onDelete: (project: Maybe<Project>) => void;
 }
 
 export function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
@@ -62,13 +63,13 @@ export function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
       <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-1">
           <Users2 className="h-4 w-4" />
-          {project?.members} members
+          {project?.members?.length} members
         </div>
         <div className="flex items-center gap-1">
           <Layout className="h-4 w-4" />
-          {project?.tasks} tasks
+          Tasks
         </div>
-        <div>Updated {project?.lastUpdated}</div>
+        <div>Updated {formatDate(project?.updateAt)}</div>
       </div>
     </Card>
   );
