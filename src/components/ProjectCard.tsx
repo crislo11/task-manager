@@ -20,56 +20,72 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
+  if (!project) return null;
+
   return (
-    <Card key={project?.id} className="p-4">
+    <Card
+      key={project.id}
+      className="p-4"
+      aria-label={`Project: ${project.title}`}
+    >
       <div className="flex items-start justify-between">
         <div className="grid gap-1">
           <Link
-            href={`/${project?.id}`}
+            href={`/${project.id}`}
             className="font-semibold hover:underline"
+            aria-label={`View project: ${project.title}`}
           >
-            {project?.title}
+            {project.title}
           </Link>
-          <p className="text-sm text-muted-foreground">
-            {project?.description}
+          <p
+            className="text-sm text-muted-foreground"
+            aria-label="Project description"
+          >
+            {project.description}
           </p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreVertical className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Open project options menu"
+            >
+              <MoreVertical className="h-4 w-4" aria-hidden="true" />
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={() => {
-                onEdit(project);
-              }}
+              onClick={() => onEdit(project)}
+              aria-label="Edit project"
             >
-              <Pencil className="mr-2 h-4 w-4" />
+              <Pencil className="mr-2 h-4 w-4" aria-hidden="true" />
               Edit Project
             </DropdownMenuItem>
             <DropdownMenuItem
               className="text-destructive"
               onClick={() => onDelete(project)}
+              aria-label="Delete project"
             >
-              <Trash className="mr-2 h-4 w-4" />
+              <Trash className="mr-2 h-4 w-4" aria-hidden="true" />
               Delete Project
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
       <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <Users2 className="h-4 w-4" />
-          {project?.members?.length} members
+        <div className="flex items-center gap-1" aria-label="Number of members">
+          <Users2 className="h-4 w-4" aria-hidden="true" />
+          {project.members?.length} members
         </div>
-        <div className="flex items-center gap-1">
-          <Layout className="h-4 w-4" />
+        <div className="flex items-center gap-1" aria-label="Tasks">
+          <Layout className="h-4 w-4" aria-hidden="true" />
           Tasks
         </div>
-        <div>Updated {formatDate(project?.updateAt)}</div>
+        <div aria-label={`Last updated: ${formatDate(project.updateAt)}`}>
+          Updated {formatDate(project.updateAt)}
+        </div>
       </div>
     </Card>
   );

@@ -20,14 +20,24 @@ export function SortSelect({ sortBy, setSortBy }: SortSelectProps) {
     <Select
       value={sortBy}
       onValueChange={(value: SortOption) => setSortBy(value)}
+      aria-label="Sort tasks by due date"
     >
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="w-[180px]" aria-labelledby="sort-select-label">
         <SelectValue placeholder="Sort by" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="none">No sorting</SelectItem>
-        <SelectItem value="dueDate-asc">Due Date (Ascending)</SelectItem>
-        <SelectItem value="dueDate-desc">Due Date (Descending)</SelectItem>
+        <SelectItem value="none" aria-label="No sorting">
+          No sorting
+        </SelectItem>
+        <SelectItem value="dueDate-asc" aria-label="Sort by due date ascending">
+          Due Date (Ascending)
+        </SelectItem>
+        <SelectItem
+          value="dueDate-desc"
+          aria-label="Sort by due date descending"
+        >
+          Due Date (Descending)
+        </SelectItem>
       </SelectContent>
     </Select>
   );

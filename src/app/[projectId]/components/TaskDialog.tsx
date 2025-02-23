@@ -58,10 +58,12 @@ export function TaskDialog({
 }: TaskDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent aria-labelledby="task-dialog-title">
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Edit Task" : "Add New Task"}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle id="task-dialog-title">
+            {isEditing ? "Edit Task" : "Add New Task"}
+          </DialogTitle>
+          <DialogDescription id="task-dialog-description">
             {isEditing
               ? "Update the task details."
               : "Create a new task for your project board."}
@@ -75,6 +77,7 @@ export function TaskDialog({
               value={taskForm.title}
               onChange={(e) => onTaskFormChange("title", e.target.value)}
               placeholder="Enter task title"
+              aria-label="Task title"
             />
           </div>
           <div className="grid gap-2">
@@ -84,6 +87,7 @@ export function TaskDialog({
               value={taskForm.description}
               onChange={(e) => onTaskFormChange("description", e.target.value)}
               placeholder="Enter task description"
+              aria-label="Task description"
             />
           </div>
           <div className="grid gap-2">
@@ -95,8 +99,9 @@ export function TaskDialog({
                   className={`w-full justify-start text-left font-normal ${
                     !taskForm.dueDate && "text-muted-foreground"
                   }`}
+                  aria-label="Select due date"
                 >
-                  <Calendar className="mr-2 h-4 w-4" />
+                  <Calendar className="mr-2 h-4 w-4" aria-hidden="true" />
                   {taskForm.dueDate
                     ? format(taskForm.dueDate, "PPP")
                     : "Pick a date"}
@@ -108,6 +113,7 @@ export function TaskDialog({
                   selected={taskForm.dueDate || undefined}
                   onSelect={(date) => onTaskFormChange("dueDate", date || null)}
                   initialFocus
+                  aria-label="Calendar for selecting due date"
                 />
               </PopoverContent>
             </Popover>
@@ -119,23 +125,37 @@ export function TaskDialog({
               onValueChange={(value: "low" | "medium" | "high") =>
                 onTaskFormChange("priority", value)
               }
+              aria-label="Select task priority"
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select priority" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="low">Low</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="low" aria-label="Low priority">
+                  Low
+                </SelectItem>
+                <SelectItem value="medium" aria-label="Medium priority">
+                  Medium
+                </SelectItem>
+                <SelectItem value="high" aria-label="High priority">
+                  High
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            aria-label="Cancel"
+          >
             Cancel
           </Button>
-          <Button onClick={onSave}>
+          <Button
+            onClick={onSave}
+            aria-label={isEditing ? "Save changes" : "Add task"}
+          >
             {isEditing ? "Save Changes" : "Add Task"}
           </Button>
         </DialogFooter>

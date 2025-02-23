@@ -27,17 +27,28 @@ export function DeleteTaskDialog({
     <AlertDialog open={!!taskToDelete} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle id="delete-task-dialog-title">
+            Are you sure?
+          </AlertDialogTitle>
+          <AlertDialogDescription id="delete-task-dialog-description">
             This action cannot be undone. This will permanently delete the task
             &quot;{taskToDelete?.title}&quot;.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel
+            aria-label="Cancel deletion"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onDelete}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            aria-label="Confirm deletion"
           >
             Delete
           </AlertDialogAction>
