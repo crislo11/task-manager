@@ -27,17 +27,29 @@ export function DeleteProjectDialog({
     <AlertDialog open={!!projectToDelete} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle id="delete-project-dialog-title">
+            Are you sure?
+          </AlertDialogTitle>
+          <AlertDialogDescription id="delete-project-dialog-description">
             This action cannot be undone. This will permanently delete the
-            project {projectToDelete?.title} and all of its tasks.
+            project <strong>{projectToDelete?.title}</strong> and all of its
+            tasks.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel
+            aria-label="Cancel deletion"
+            onClick={(e) => e.stopPropagation()}
+          >
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onDelete}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            aria-label="Confirm deletion"
           >
             Delete Project
           </AlertDialogAction>

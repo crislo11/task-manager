@@ -2,7 +2,7 @@
 
 import { use, useCallback, useState } from "react";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TaskCard } from "./components/TaskCard";
 import { TaskDialog } from "./components/TaskDialog";
@@ -184,9 +184,19 @@ export default function ProjectBoard({ params }: { params: ProjectParams }) {
     setTaskToDelete(null);
   };
 
-  if (loading) {
-    return <div role="status">Loading...</div>;
-  }
+  if (loading)
+    return (
+      <div
+        className="min-h-screen bg-background flex items-center justify-center"
+        role="status"
+        aria-label="Loading"
+      >
+        <Loader2
+          className="h-8 w-8 animate-spin text-primary"
+          aria-hidden="true"
+        />
+      </div>
+    );
 
   if (error) {
     return <div role="alert">Error: {error.message}</div>;
