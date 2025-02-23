@@ -10,9 +10,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import type { Maybe, Project } from "@/types";
 
 interface DeleteProjectDialogProps {
-  projectToDelete: { title: string } | null;
+  projectToDelete: Maybe<Project>;
   onOpenChange: (open: boolean) => void;
   onDelete: () => void;
 }

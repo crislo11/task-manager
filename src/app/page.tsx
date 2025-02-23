@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { TagInput } from "@/components/ui/tag-input";
+import { useCollection } from "@/hooks/useCollection";
 import { ProjectCard } from "@/components/ProjectCard";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { EditProjectDialog } from "@/components/EditProjectDialog";
@@ -20,93 +22,87 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { Project } from "@/types";
+import type { Maybe, Project } from "@/types";
 
 export default function ProjectList() {
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: "1",
-      title: "E-commerce Website Redesign",
-      description:
-        "Modernizing the user interface and improving the shopping experience",
-      members: 5,
-      tasks: 12,
-      lastUpdated: "2024-02-22",
-    },
-    {
-      id: "2",
-      title: "Mobile App Development",
-      description: "Creating a new mobile application for our service",
-      members: 4,
-      tasks: 8,
-      lastUpdated: "2024-02-21",
-    },
-    {
-      id: "3",
-      title: "Marketing Campaign",
-      description: "Q1 2024 digital marketing campaign planning and execution",
-      members: 3,
-      tasks: 15,
-      lastUpdated: "2024-02-20",
-    },
-  ]);
-
+  const {
+    data: projects,
+    loading,
+    deleteItem,
+    addItem,
+    updateItem,
+  } = useCollection<Project>("projects");
   const [newProject, setNewProject] = useState({
     title: "",
     description: "",
+    members: [] as string[],
   });
   const [isNewProjectDialogOpen, setIsNewProjectDialogOpen] = useState(false);
-  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editingProject, setEditingProject] = useState<Maybe<Project>>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [projectToDelete, setProjectToDelete] = useState<Maybe<Project>>(null);
 
-  const handleAddProject = () => {
+  const handleAddProject = async () => {
     if (!newProject.title.trim()) return;
 
-    const project: Project = {
-      id: Math.random().toString(36).substr(2, 9),
+    const projectData: Omit<Project, "id"> = {
       title: newProject.title,
-      description: newProject.description,
-      members: 1,
-      tasks: 0,
-      lastUpdated: new Date().toISOString().split("T")[0],
+      description: newProject.description || null,
+      members: newProject.members,
     };
 
-    setProjects([project, ...projects]);
-    setNewProject({ title: "", description: "" });
-    setIsNewProjectDialogOpen(false);
-    toast.success("Project created successfully");
+    const success = await addItem(projectData);
+
+    if (success) {
+      setNewProject({ title: "", description: "", members: [] });
+      setIsNewProjectDialogOpen(false);
+      toast.success("Project created successfully");
+    } else {
+      toast.error("Error creating project");
+    }
   };
 
-  const handleEditProject = () => {
-    if (!editingProject || !editingProject.title.trim()) return;
+  const handleEdit = (project: Maybe<Project>) => {
+    setEditingProject(project);
+    setIsEditDialogOpen(true);
+  };
 
-    const updatedProjects = projects.map((project) =>
-      project.id === editingProject.id
-        ? {
-            ...project,
-            title: editingProject.title,
-            description: editingProject.description,
-          }
-        : project
+  const handleEditProject = async () => {
+    if (!editingProject?.id || !editingProject.title.trim()) return;
+
+    const success = await updateItem(editingProject.id, {
+      title: editingProject.title,
+      description: editingProject.description,
+      members: editingProject.members,
+    });
+
+    if (success) {
+      setIsEditDialogOpen(false);
+      setEditingProject(null);
+      toast.success("Project updated successfully");
+    } else {
+      toast.error("Error updating project");
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    if (!projectToDelete?.id) return;
+
+    const success = await deleteItem(projectToDelete.id);
+    if (success) {
+      setProjectToDelete(null);
+      toast.success("Project deleted successfully");
+    } else {
+      toast.error("Error deleting project");
+    }
+  };
+
+  if (loading)
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
     );
-
-    setProjects(updatedProjects);
-    setIsEditDialogOpen(false);
-    setEditingProject(null);
-    toast.success("Project updated successfully");
-  };
-
-  const handleDeleteProject = () => {
-    if (!projectToDelete) return;
-
-    const updatedProjects = projects.filter(
-      (project) => project.id !== projectToDelete.id
-    );
-    setProjects(updatedProjects);
-    setProjectToDelete(null);
-    toast.success("Project deleted successfully");
-  };
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6">
@@ -118,67 +114,75 @@ export default function ProjectList() {
               Manage and track all your projects
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <Dialog
-              open={isNewProjectDialogOpen}
-              onOpenChange={setIsNewProjectDialogOpen}
-            >
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Project
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New Project</DialogTitle>
-                  <DialogDescription>
-                    Add a new project for your team.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="title">Project Title</Label>
-                    <Input
-                      id="title"
-                      value={newProject.title}
-                      onChange={(e) =>
-                        setNewProject((prev) => ({
-                          ...prev,
-                          title: e.target.value,
-                        }))
-                      }
-                      placeholder="Enter project title"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={newProject.description}
-                      onChange={(e) =>
-                        setNewProject((prev) => ({
-                          ...prev,
-                          description: e.target.value,
-                        }))
-                      }
-                      placeholder="Enter project description"
-                    />
-                  </div>
+          <ThemeToggle />
+          <Dialog
+            open={isNewProjectDialogOpen}
+            onOpenChange={setIsNewProjectDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                New Project
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Project</DialogTitle>
+                <DialogDescription>
+                  Add a new project for your team.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="title">Project Title</Label>
+                  <Input
+                    id="title"
+                    value={newProject.title}
+                    onChange={(e) =>
+                      setNewProject((prev) => ({
+                        ...prev,
+                        title: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter project title"
+                  />
                 </div>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsNewProjectDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddProject}>Create Project</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={newProject.description}
+                    onChange={(e) =>
+                      setNewProject((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter project description"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Members</Label>
+                  <TagInput
+                    value={newProject.members}
+                    onChange={(members) =>
+                      setNewProject((prev) => ({ ...prev, members }))
+                    }
+                    placeholder="With email of member and press Enter..."
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsNewProjectDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleAddProject}>Create Project</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="grid gap-4">
@@ -186,11 +190,8 @@ export default function ProjectList() {
             <ProjectCard
               key={project.id}
               project={project}
-              onEdit={(project) => {
-                setEditingProject(project);
-                setIsEditDialogOpen(true);
-              }}
-              onDelete={(project) => setProjectToDelete(project)}
+              onEdit={handleEdit}
+              onDelete={setProjectToDelete}
             />
           ))}
         </div>
