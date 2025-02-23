@@ -27,11 +27,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { Maybe } from "@/types";
 
 interface TaskForm {
   title: string;
   description: string;
-  dueDate: Date | null;
+  dueDate: Maybe<Date>;
   priority: "low" | "medium" | "high";
 }
 

@@ -11,3 +11,15 @@ export interface Project {
   createAt?: Maybe<Timestamp>;
   updateAt?: Maybe<Timestamp>;
 }
+
+export interface Task {
+  id?: string;
+  projectId: string;
+  title: string;
+  description: string;
+  status: "todo" | "in-progress" | "done";
+  priority: "low" | "medium" | "high";
+  dueDate?: Maybe<Date>;
+  createAt?: Maybe<Timestamp>;
+  updateAt?: Maybe<Timestamp>;
+}
