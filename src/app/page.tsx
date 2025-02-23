@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ProjectCard } from "@/components/ProjectCard";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { EditProjectDialog } from "@/components/EditProjectDialog";
 import { DeleteProjectDialog } from "@/components/DeleteProjectDialog";
 import {
@@ -19,7 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Project } from "@/types";
+import type { Project } from "@/types";
 
 export default function ProjectList() {
   const [projects, setProjects] = useState<Project[]>([
@@ -117,6 +118,7 @@ export default function ProjectList() {
               Manage and track all your projects
             </p>
           </div>
+          <ThemeToggle />
           <Dialog
             open={isNewProjectDialogOpen}
             onOpenChange={setIsNewProjectDialogOpen}
@@ -175,14 +177,6 @@ export default function ProjectList() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-
-          {/* <NewProjectDialog
-            open={isNewProjectDialogOpen}
-            onOpenChange={setIsNewProjectDialogOpen}
-            newProject={newProject}
-            setNewProject={setNewProject}
-            handleAddProject={handleAddProject}
-          /> */}
         </div>
 
         <div className="grid gap-4">

@@ -8,6 +8,7 @@ import { TaskCard } from "./components/TaskCard";
 import { TaskDialog } from "./components/TaskDialog";
 import { SortSelect } from "./components/SortSelect";
 import { FilterSheet } from "./components/FilterSheet";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { DeleteTaskDialog } from "./components/DeleteTaskDialog";
 
 interface Task {
@@ -247,10 +248,13 @@ export default function ProjectBoard() {
       <div className="mb-6 space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Project Board</h1>
-          <Button onClick={() => handleOpenDialog()}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Task
-          </Button>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <Button onClick={() => handleOpenDialog()}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Task
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
