@@ -244,7 +244,7 @@ export default function ProjectBoard() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="min-h-screen bg-background py-4 px-8">
       <div className="mb-6 space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Project Board</h1>
