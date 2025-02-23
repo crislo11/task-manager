@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { use, useCallback, useState } from "react";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,34 +10,37 @@ import { SortSelect } from "./components/SortSelect";
 import { FilterSheet } from "./components/FilterSheet";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { DeleteTaskDialog } from "./components/DeleteTaskDialog";
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  dueDate: Date | null;
-  priority: "low" | "medium" | "high";
-}
-
-interface Column {
-  id: string;
-  title: string;
-  tasks: Task[];
-}
+import { useProjectTasks } from "@/hooks/useProjectTasks";
+import type { Maybe, Task } from "@/types";
 
 type SortOption = "dueDate-asc" | "dueDate-desc" | "none";
 
-export default function ProjectBoard() {
+type ProjectParams = Promise<{ projectId: string }>;
+
+export default function ProjectBoard({ params }: { params: ProjectParams }) {
+  const { projectId } = use(params);
+
+  const {
+    loading,
+    error,
+    todoTasks,
+    inProgressTasks,
+    doneTasks,
+    addTask,
+    updateTask,
+    deleteTask,
+  } = useProjectTasks(projectId);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("none");
-  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [draggedTask, setDraggedTask] = useState<Maybe<Task>>(null);
+  const [editingTask, setEditingTask] = useState<Maybe<Task>>(null);
+  const [taskToDelete, setTaskToDelete] = useState<Maybe<Task>>(null);
   const [priorityFilters, setPriorityFilters] = useState<string[]>([]);
   const [taskForm, setTaskForm] = useState<{
     title: string;
     description: string;
-    dueDate: Date | null;
+    dueDate: Maybe<Date>;
     priority: "low" | "medium" | "high";
   }>({
     title: "",
@@ -45,68 +48,17 @@ export default function ProjectBoard() {
     dueDate: null,
     priority: "low",
   });
-  const [columns, setColumns] = useState<Column[]>([
-    {
-      id: "todo",
-      title: "To Do",
-      tasks: [
-        {
-          id: "1",
-          title: "Research competitors",
-          description: "Look into similar products and analyze their features",
-          dueDate: null,
-          priority: "low",
-        },
-        {
-          id: "2",
-          title: "Design system",
-          description: "Create a consistent design system for the application",
-          dueDate: null,
-          priority: "medium",
-        },
-      ],
-    },
-    {
-      id: "in-progress",
-      title: "In Progress",
-      tasks: [
-        {
-          id: "3",
-          title: "User authentication",
-          description: "Implement login and registration functionality",
-          dueDate: null,
-          priority: "high",
-        },
-      ],
-    },
-    {
-      id: "done",
-      title: "Done",
-      tasks: [
-        {
-          id: "4",
-          title: "Project setup",
-          description:
-            "Initialize repository and set up development environment",
-          dueDate: null,
-          priority: "low",
-        },
-      ],
-    },
-  ]);
 
   const filteredAndSortedTasks = useCallback(
     (tasks: Task[]) => {
       let filtered = tasks;
 
-      // Apply priority filters
       if (priorityFilters.length > 0) {
         filtered = filtered.filter((task) =>
           priorityFilters.includes(task.priority)
         );
       }
 
-      // Apply sorting
       if (sortBy !== "none") {
         filtered = [...filtered].sort((a, b) => {
           if (!a.dueDate || !b.dueDate) return 0;
@@ -130,7 +82,7 @@ export default function ProjectBoard() {
     setTaskForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleDragStart = (task: Task) => {
+  const handleDragStart = (task: Maybe<Task>) => {
     setDraggedTask(task);
   };
 
@@ -138,38 +90,29 @@ export default function ProjectBoard() {
     e.preventDefault();
   };
 
-  const handleDrop = (columnId: string) => {
+  const handleDrop = async (status: Task["status"]) => {
     if (!draggedTask) return;
 
-    const updatedColumns = columns.map((column) => {
-      // Remove the task from its original column
-      if (column.tasks.find((task) => task.id === draggedTask.id)) {
-        return {
-          ...column,
-          tasks: column.tasks.filter((task) => task.id !== draggedTask.id),
-        };
-      }
-      // Add the task to the new column
-      if (column.id === columnId) {
-        return {
-          ...column,
-          tasks: [...column.tasks, draggedTask],
-        };
-      }
-      return column;
+    const success = await updateTask(draggedTask.id!, {
+      status: status,
     });
 
-    setColumns(updatedColumns);
+    if (success) {
+      toast.success("Task moved successfully");
+    } else {
+      toast.error("Failed to move task");
+    }
+
     setDraggedTask(null);
   };
 
-  const handleOpenDialog = (task?: Task) => {
+  const handleOpenDialog = (task?: Maybe<Task>) => {
     if (task) {
       setEditingTask(task);
       setTaskForm({
         title: task.title,
         description: task.description,
-        dueDate: task.dueDate,
+        dueDate: task.dueDate ? new Date(task.dueDate) : null,
         priority: task.priority,
       });
     } else {
@@ -184,37 +127,33 @@ export default function ProjectBoard() {
     setIsDialogOpen(true);
   };
 
-  const handleSaveTask = () => {
+  const handleSaveTask = async () => {
     if (!taskForm.title.trim()) return;
 
     if (editingTask) {
-      // Update existing task
-      const updatedColumns = columns.map((column) => ({
-        ...column,
-        tasks: column.tasks.map((task) =>
-          task.id === editingTask.id ? { ...task, ...taskForm } : task
-        ),
-      }));
-      setColumns(updatedColumns);
-      toast.success("Task updated successfully");
-    } else {
-      // Create new task
-      const newTask: Task = {
-        id: Math.random().toString(36).substr(2, 9),
+      const success = await updateTask(editingTask.id!, {
         ...taskForm,
-      };
-
-      const updatedColumns = columns.map((column) => {
-        if (column.id === "todo") {
-          return {
-            ...column,
-            tasks: [...column.tasks, newTask],
-          };
-        }
-        return column;
+        dueDate: taskForm.dueDate ? taskForm.dueDate : null,
       });
-      setColumns(updatedColumns);
-      toast.success("Task created successfully");
+
+      if (success) {
+        toast.success("Task updated successfully");
+      } else {
+        toast.error("Failed to update task");
+      }
+    } else {
+      const taskId = await addTask({
+        ...taskForm,
+        projectId: projectId,
+        status: "todo",
+        dueDate: taskForm.dueDate ? taskForm.dueDate : null,
+      });
+
+      if (taskId) {
+        toast.success("Task created successfully");
+      } else {
+        toast.error("Failed to create task");
+      }
     }
 
     setIsDialogOpen(false);
@@ -227,21 +166,37 @@ export default function ProjectBoard() {
     });
   };
 
-  const handleOpenDeleteDialog = (task: Task) => {
+  const handleOpenDeleteDialog = (task: Maybe<Task>) => {
     setTaskToDelete(task);
   };
 
-  const handleDeleteTask = () => {
+  const handleDeleteTask = async () => {
     if (!taskToDelete) return;
 
-    const updatedColumns = columns.map((column) => ({
-      ...column,
-      tasks: column.tasks.filter((task) => task.id !== taskToDelete.id),
-    }));
-    setColumns(updatedColumns);
-    toast.success("Task deleted successfully");
+    const success = await deleteTask(taskToDelete.id!);
+
+    if (success) {
+      toast.success("Task deleted successfully");
+    } else {
+      toast.error("Failed to delete task");
+    }
+
     setTaskToDelete(null);
   };
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  const columns = [
+    { id: "todo", title: "To Do", tasks: todoTasks },
+    { id: "in-progress", title: "In Progress", tasks: inProgressTasks },
+    { id: "done", title: "Done", tasks: doneTasks },
+  ];
 
   return (
     <div className="min-h-screen bg-background py-4 px-8">
@@ -281,7 +236,7 @@ export default function ProjectBoard() {
             key={column.id}
             className="rounded-lg border bg-card p-4"
             onDragOver={handleDragOver}
-            onDrop={() => handleDrop(column.id)}
+            onDrop={() => handleDrop(column.id as Task["status"])}
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-semibold">{column.title}</h2>
