@@ -33,10 +33,12 @@ export function EditProjectDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent aria-labelledby="edit-project-dialog-title">
         <DialogHeader>
-          <DialogTitle>Edit Project</DialogTitle>
-          <DialogDescription>Update your project details.</DialogDescription>
+          <DialogTitle id="edit-project-dialog-title">Edit Project</DialogTitle>
+          <DialogDescription id="edit-project-dialog-description">
+            Update your project details.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
@@ -52,6 +54,7 @@ export function EditProjectDialog({
               }
               placeholder="Enter project title"
               disabled={!editingProject}
+              aria-label="Project title"
             />
           </div>
           <div className="grid gap-2">
@@ -67,6 +70,7 @@ export function EditProjectDialog({
               }
               placeholder="Enter project description"
               disabled={!editingProject}
+              aria-label="Project description"
             />
           </div>
           <div className="grid gap-2">
@@ -80,14 +84,21 @@ export function EditProjectDialog({
                 })
               }
               placeholder="Write email of member and press Enter..."
+              aria-label="Project members"
             />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            aria-label="Cancel editing project"
+          >
             Cancel
           </Button>
-          <Button onClick={onEditProject}>Save Changes</Button>
+          <Button onClick={onEditProject} aria-label="Save changes">
+            Save Changes
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

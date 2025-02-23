@@ -17,7 +17,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -99,8 +98,15 @@ export default function ProjectList() {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div
+        className="min-h-screen bg-background flex items-center justify-center"
+        role="status"
+        aria-label="Loading"
+      >
+        <Loader2
+          className="h-8 w-8 animate-spin text-primary"
+          aria-hidden="true"
+        />
       </div>
     );
 
@@ -109,19 +115,21 @@ export default function ProjectList() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold md:text-3xl">Projects</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <h1 className="text-2xl font-bold md:text-3xl" tabIndex={0}>
+              Projects
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground" tabIndex={0}>
               Manage and track all your projects
             </p>
           </div>
-          <ThemeToggle />
+          <ThemeToggle aria-label="Toggle theme" />
           <Dialog
             open={isNewProjectDialogOpen}
             onOpenChange={setIsNewProjectDialogOpen}
           >
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
+              <Button aria-label="Create new project">
+                <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
                 New Project
               </Button>
             </DialogTrigger>
@@ -145,6 +153,7 @@ export default function ProjectList() {
                       }))
                     }
                     placeholder="Enter project title"
+                    aria-label="Project title"
                   />
                 </div>
                 <div className="grid gap-2">
@@ -159,6 +168,7 @@ export default function ProjectList() {
                       }))
                     }
                     placeholder="Enter project description"
+                    aria-label="Project description"
                   />
                 </div>
                 <div className="grid gap-2">
@@ -169,18 +179,22 @@ export default function ProjectList() {
                       setNewProject((prev) => ({ ...prev, members }))
                     }
                     placeholder="With email of member and press Enter..."
+                    aria-label="Project members"
                   />
                 </div>
               </div>
-              <DialogFooter>
+              <div className="flex justify-end gap-2">
                 <Button
                   variant="outline"
                   onClick={() => setIsNewProjectDialogOpen(false)}
+                  aria-label="Cancel creating new project"
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleAddProject}>Create Project</Button>
-              </DialogFooter>
+                <Button onClick={handleAddProject} aria-label="Create project">
+                  Create Project
+                </Button>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
@@ -192,6 +206,7 @@ export default function ProjectList() {
               project={project}
               onEdit={handleEdit}
               onDelete={setProjectToDelete}
+              aria-label={`Project: ${project.title}. Press Enter to edit or Delete to remove.`}
             />
           ))}
         </div>
@@ -202,12 +217,14 @@ export default function ProjectList() {
           editingProject={editingProject}
           onEditProject={handleEditProject}
           setEditingProject={setEditingProject}
+          aria-label="Edit project dialog"
         />
 
         <DeleteProjectDialog
           projectToDelete={projectToDelete}
           onOpenChange={(open) => !open && setProjectToDelete(null)}
           onDelete={handleDeleteProject}
+          aria-label="Delete project confirmation dialog"
         />
       </div>
     </div>

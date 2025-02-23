@@ -25,8 +25,8 @@ export function FilterSheet({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Filter className="mr-2 h-4 w-4" />
+        <Button variant="outline" size="sm" aria-label="Open filters">
+          <Filter className="mr-2 h-4 w-4" aria-hidden="true" />
           Filter
           {priorityFilters.length > 0 && (
             <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">
@@ -35,15 +35,21 @@ export function FilterSheet({
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent side="left">
+      <SheetContent side="left" aria-labelledby="filter-sheet-title">
         <SheetHeader>
-          <SheetTitle>Filter Tasks</SheetTitle>
-          <SheetDescription>Filter tasks by priority</SheetDescription>
+          <SheetTitle id="filter-sheet-title">Filter Tasks</SheetTitle>
+          <SheetDescription id="filter-sheet-description">
+            Filter tasks by priority
+          </SheetDescription>
         </SheetHeader>
         <div className="mt-4 space-y-4">
           <div className="space-y-4">
-            <Label>Priority</Label>
-            <div className="space-y-2">
+            <Label htmlFor="priority-filters">Priority</Label>
+            <div
+              className="space-y-2"
+              role="group"
+              aria-labelledby="priority-filters"
+            >
               {["low", "medium", "high"].map((priority) => (
                 <div key={priority} className="flex items-center space-x-2">
                   <Checkbox
@@ -58,6 +64,7 @@ export function FilterSheet({
                         );
                       }
                     }}
+                    aria-label={`Filter by ${priority} priority`}
                   />
                   <Label htmlFor={priority} className="capitalize">
                     {priority}
