@@ -2,10 +2,23 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { ProjectCard } from "@/components/ProjectCard";
-import { NewProjectDialog } from "@/components/NewProjectDialog";
 import { EditProjectDialog } from "@/components/EditProjectDialog";
 import { DeleteProjectDialog } from "@/components/DeleteProjectDialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Project } from "@/types";
 
 export default function ProjectList() {
@@ -104,7 +117,7 @@ export default function ProjectList() {
               Manage and track all your projects
             </p>
           </div>
-          {/* <Dialog
+          <Dialog
             open={isNewProjectDialogOpen}
             onOpenChange={setIsNewProjectDialogOpen}
           >
@@ -161,15 +174,15 @@ export default function ProjectList() {
                 <Button onClick={handleAddProject}>Create Project</Button>
               </DialogFooter>
             </DialogContent>
-          </Dialog> */}
+          </Dialog>
 
-          <NewProjectDialog
+          {/* <NewProjectDialog
             open={isNewProjectDialogOpen}
             onOpenChange={setIsNewProjectDialogOpen}
             newProject={newProject}
             setNewProject={setNewProject}
             handleAddProject={handleAddProject}
-          />
+          /> */}
         </div>
 
         <div className="grid gap-4">
