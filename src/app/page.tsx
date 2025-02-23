@@ -1,101 +1,205 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { toast } from "sonner";
+import { ProjectCard } from "@/components/ProjectCard";
+import { NewProjectDialog } from "@/components/NewProjectDialog";
+import { EditProjectDialog } from "@/components/EditProjectDialog";
+import { DeleteProjectDialog } from "@/components/DeleteProjectDialog";
+import { Project } from "@/types";
+
+export default function ProjectList() {
+  const [projects, setProjects] = useState<Project[]>([
+    {
+      id: "1",
+      title: "E-commerce Website Redesign",
+      description:
+        "Modernizing the user interface and improving the shopping experience",
+      members: 5,
+      tasks: 12,
+      lastUpdated: "2024-02-22",
+    },
+    {
+      id: "2",
+      title: "Mobile App Development",
+      description: "Creating a new mobile application for our service",
+      members: 4,
+      tasks: 8,
+      lastUpdated: "2024-02-21",
+    },
+    {
+      id: "3",
+      title: "Marketing Campaign",
+      description: "Q1 2024 digital marketing campaign planning and execution",
+      members: 3,
+      tasks: 15,
+      lastUpdated: "2024-02-20",
+    },
+  ]);
+
+  const [newProject, setNewProject] = useState({
+    title: "",
+    description: "",
+  });
+  const [isNewProjectDialogOpen, setIsNewProjectDialogOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+
+  const handleAddProject = () => {
+    if (!newProject.title.trim()) return;
+
+    const project: Project = {
+      id: Math.random().toString(36).substr(2, 9),
+      title: newProject.title,
+      description: newProject.description,
+      members: 1,
+      tasks: 0,
+      lastUpdated: new Date().toISOString().split("T")[0],
+    };
+
+    setProjects([project, ...projects]);
+    setNewProject({ title: "", description: "" });
+    setIsNewProjectDialogOpen(false);
+    toast.success("Project created successfully");
+  };
+
+  const handleEditProject = () => {
+    if (!editingProject || !editingProject.title.trim()) return;
+
+    const updatedProjects = projects.map((project) =>
+      project.id === editingProject.id
+        ? {
+            ...project,
+            title: editingProject.title,
+            description: editingProject.description,
+          }
+        : project
+    );
+
+    setProjects(updatedProjects);
+    setIsEditDialogOpen(false);
+    setEditingProject(null);
+    toast.success("Project updated successfully");
+  };
+
+  const handleDeleteProject = () => {
+    if (!projectToDelete) return;
+
+    const updatedProjects = projects.filter(
+      (project) => project.id !== projectToDelete.id
+    );
+    setProjects(updatedProjects);
+    setProjectToDelete(null);
+    toast.success("Project deleted successfully");
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-background p-4 md:p-6">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold md:text-3xl">Projects</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Manage and track all your projects
+            </p>
+          </div>
+          {/* <Dialog
+            open={isNewProjectDialogOpen}
+            onOpenChange={setIsNewProjectDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                New Project
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Project</DialogTitle>
+                <DialogDescription>
+                  Add a new project for your team.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="title">Project Title</Label>
+                  <Input
+                    id="title"
+                    value={newProject.title}
+                    onChange={(e) =>
+                      setNewProject((prev) => ({
+                        ...prev,
+                        title: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter project title"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={newProject.description}
+                    onChange={(e) =>
+                      setNewProject((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter project description"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsNewProjectDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleAddProject}>Create Project</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog> */}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          <NewProjectDialog
+            open={isNewProjectDialogOpen}
+            onOpenChange={setIsNewProjectDialogOpen}
+            newProject={newProject}
+            setNewProject={setNewProject}
+            handleAddProject={handleAddProject}
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="grid gap-4">
+          {projects.map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              onEdit={(project) => {
+                setEditingProject(project);
+                setIsEditDialogOpen(true);
+              }}
+              onDelete={(project) => setProjectToDelete(project)}
+            />
+          ))}
+        </div>
+
+        <EditProjectDialog
+          isOpen={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          editingProject={editingProject}
+          onEditProject={handleEditProject}
+          setEditingProject={setEditingProject}
+        />
+
+        <DeleteProjectDialog
+          projectToDelete={projectToDelete}
+          onOpenChange={(open) => !open && setProjectToDelete(null)}
+          onDelete={handleDeleteProject}
+        />
+      </div>
     </div>
   );
 }
