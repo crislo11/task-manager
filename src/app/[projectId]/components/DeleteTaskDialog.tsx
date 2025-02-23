@@ -10,9 +10,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import type { Maybe, Task } from "@/types";
 
 interface DeleteTaskDialogProps {
-  taskToDelete: { id: string; title: string } | null;
+  taskToDelete: Maybe<Task>;
   onOpenChange: (open: boolean) => void;
   onDelete: () => void;
 }
