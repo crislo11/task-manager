@@ -26,7 +26,7 @@ interface Column {
 
 type SortOption = "dueDate-asc" | "dueDate-desc" | "none";
 
-export default function ProjectBoard({}: { params: { projectId: string } }) {
+export default function ProjectBoard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("none");
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
