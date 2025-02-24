@@ -2,6 +2,9 @@
 
 This project is a task manager built with **Next.js**, **React**, **TypeScript**, **TailwindCSS**, and **ShadCN UI**. It uses **Firebase** as the backend for real-time data storage, and task management. The project is designed to be scalable, efficient, and easy to maintain.
 
+## Real-time Demo
+
+[![Watch the video]()](https://jumpshare.com/embed/TeHN9iUo4TLF5JLdfWXO)
 ## Project Architecture
 
 The project follows a modular and scalable architecture, organized as follows:
