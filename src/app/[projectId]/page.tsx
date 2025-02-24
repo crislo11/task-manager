@@ -1,8 +1,9 @@
 "use client";
 
 import { use, useCallback, useState } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
-import { Loader2, Plus } from "lucide-react";
+import { ChevronLeft, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TaskCard } from "./components/TaskCard";
 import { TaskDialog } from "./components/TaskDialog";
@@ -10,6 +11,12 @@ import { SortSelect } from "./components/SortSelect";
 import { FilterSheet } from "./components/FilterSheet";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { DeleteTaskDialog } from "./components/DeleteTaskDialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useProjectTasks } from "@/hooks/useProjectTasks";
 import type { Maybe, Task } from "@/types";
 
@@ -209,94 +216,114 @@ export default function ProjectBoard({ params }: { params: ProjectParams }) {
   ];
 
   return (
-    <div className="min-h-screen bg-background py-4 px-8">
-      <div className="mb-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold" tabIndex={0}>
-            Project Board
-          </h1>
-          <div className="flex items-center gap-4">
-            <ThemeToggle aria-label="Toggle theme" />
-            <Button
-              onClick={() => handleOpenDialog()}
-              aria-label="Add Task"
+    <TooltipProvider>
+      <div className="min-h-screen bg-background py-4 px-8">
+        <div className="mb-6 space-y-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/"
+                  className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                  aria-label="Back to projects list"
+                >
+                  <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                  <span>Back to Projects</span>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent aria-label="Return to projects list">
+                Return to projects list
+              </TooltipContent>
+            </Tooltip>
+          </div>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold" tabIndex={0}>
+              Project Board
+            </h1>
+            <div className="flex items-center gap-4">
+              <ThemeToggle aria-label="Toggle theme" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button onClick={() => handleOpenDialog()}>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Task
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Create a new task</TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4">
+            <FilterSheet
+              priorityFilters={priorityFilters}
+              setPriorityFilters={setPriorityFilters}
+              aria-label="Filter tasks by priority"
+            />
+            <SortSelect
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              aria-label="Sort tasks by due date"
+            />
+          </div>
+        </div>
+
+        <TaskDialog
+          isOpen={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          taskForm={taskForm}
+          onTaskFormChange={handleTaskFormChange}
+          onSave={handleSaveTask}
+          isEditing={!!editingTask}
+          aria-label={editingTask ? "Edit Task" : "Add Task"}
+        />
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {columns.map((column) => (
+            <div
+              key={column.id}
+              className="rounded-lg border bg-card p-4"
+              onDragOver={handleDragOver}
+              onDrop={() => handleDrop(column.id as Task["status"])}
+              aria-label={`${column.title} column`}
               tabIndex={0}
             >
-              <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
-              Add Task
-            </Button>
-          </div>
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="font-semibold" tabIndex={0}>
+                  {column.title}
+                </h2>
+                <span
+                  className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium"
+                  aria-label={`Number of tasks in ${column.title}: ${
+                    filteredAndSortedTasks(column.tasks).length
+                  }`}
+                >
+                  {filteredAndSortedTasks(column.tasks).length}
+                </span>
+              </div>
+              <div className="space-y-4">
+                {filteredAndSortedTasks(column.tasks).map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onDragStart={handleDragStart}
+                    onEdit={handleOpenDialog}
+                    onDelete={handleOpenDeleteDialog}
+                    aria-label={`Task: ${task.title}. Press Enter to edit or Delete to remove.`}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
-          <FilterSheet
-            priorityFilters={priorityFilters}
-            setPriorityFilters={setPriorityFilters}
-            aria-label="Filter tasks by priority"
-          />
-          <SortSelect
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            aria-label="Sort tasks by due date"
-          />
-        </div>
+        <DeleteTaskDialog
+          taskToDelete={taskToDelete}
+          onOpenChange={(open) => !open && setTaskToDelete(null)}
+          onDelete={handleDeleteTask}
+          aria-label="Delete Task Confirmation"
+        />
       </div>
-
-      <TaskDialog
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        taskForm={taskForm}
-        onTaskFormChange={handleTaskFormChange}
-        onSave={handleSaveTask}
-        isEditing={!!editingTask}
-        aria-label={editingTask ? "Edit Task" : "Add Task"}
-      />
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {columns.map((column) => (
-          <div
-            key={column.id}
-            className="rounded-lg border bg-card p-4"
-            onDragOver={handleDragOver}
-            onDrop={() => handleDrop(column.id as Task["status"])}
-            aria-label={`${column.title} column`}
-            tabIndex={0}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-semibold" tabIndex={0}>
-                {column.title}
-              </h2>
-              <span
-                className="rounded-full bg-primary/10 px-2 py-1 text-xs font-medium"
-                aria-label={`Number of tasks in ${column.title}: ${
-                  filteredAndSortedTasks(column.tasks).length
-                }`}
-              >
-                {filteredAndSortedTasks(column.tasks).length}
-              </span>
-            </div>
-            <div className="space-y-4">
-              {filteredAndSortedTasks(column.tasks).map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  onDragStart={handleDragStart}
-                  onEdit={handleOpenDialog}
-                  onDelete={handleOpenDeleteDialog}
-                  aria-label={`Task: ${task.title}. Press Enter to edit or Delete to remove.`}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <DeleteTaskDialog
-        taskToDelete={taskToDelete}
-        onOpenChange={(open) => !open && setTaskToDelete(null)}
-        onDelete={handleDeleteTask}
-        aria-label="Delete Task Confirmation"
-      />
-    </div>
+    </TooltipProvider>
   );
 }
