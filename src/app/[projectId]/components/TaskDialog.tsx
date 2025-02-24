@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar } from "lucide-react";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -102,7 +102,7 @@ export function TaskDialog({
                   aria-label="Select due date"
                 >
                   <Calendar className="mr-2 h-4 w-4" aria-hidden="true" />
-                  {taskForm.dueDate
+                  {taskForm.dueDate && isValid(taskForm.dueDate)
                     ? format(taskForm.dueDate, "PPP")
                     : "Pick a date"}
                 </Button>
