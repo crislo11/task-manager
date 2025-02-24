@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, FolderPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -205,15 +205,47 @@ export default function ProjectList() {
         </div>
 
         <div className="grid gap-4">
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onEdit={handleEdit}
-              onDelete={setProjectToDelete}
-              aria-label={`Project: ${project.title}. Press Enter to edit or Delete to remove.`}
-            />
-          ))}
+          {projects.length === 0 ? (
+            <div
+              className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center animate-in fade-in-50"
+              role="alert"
+              aria-labelledby="no-projects-title no-projects-description"
+            >
+              <div
+                className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10"
+                aria-hidden="true"
+              >
+                <FolderPlus className="h-6 w-6 text-primary" />
+              </div>
+              <h2 id="no-projects-title" className="mt-4 text-lg font-semibold">
+                No projects yet
+              </h2>
+              <p
+                id="no-projects-description"
+                className="mb-4 mt-2 text-sm text-muted-foreground max-w-sm"
+              >
+                Get started by creating your first project. Projects help you
+                organize and track your tasks.
+              </p>
+              <Button
+                onClick={() => setIsNewProjectDialogOpen(true)}
+                aria-label="Create your first project"
+              >
+                <Plus className="mr-2 h-4 w-4" aria-hidden="true" /> Create Your
+                First Project
+              </Button>
+            </div>
+          ) : (
+            projects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onEdit={handleEdit}
+                onDelete={setProjectToDelete}
+                aria-label={`Project: ${project.title}. Press Enter to edit or Delete to remove.`}
+              />
+            ))
+          )}
         </div>
 
         <EditProjectDialog
