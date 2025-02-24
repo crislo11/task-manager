@@ -89,6 +89,14 @@ task-manager/
 
 - Since Firebase already handles much of the application state (authentication, real-time data), adding a global state management library would be redundant and increase unnecessary complexity. Custom hooks are sufficient for managing the remaining state.
 
+**Testing:**
+
+- Jest and React Testing Library were used for testing the application.
+
+**Accessibility:**
+
+- The application is designed to be accessible, with a focus on providing a good user experience for all users. using aria-labels and aria-roles.
+
 **ShadCN UI and TailwindCSS:**
 
 - These tools enable rapid and consistent development, making them ideal for small to medium-sized projects where development speed is crucial.
