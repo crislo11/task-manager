@@ -3,7 +3,7 @@
 import { use, useCallback, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ChevronLeft, Loader2, Plus } from "lucide-react";
+import { ChevronLeft, ListTodo, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TaskCard } from "./components/TaskCard";
 import { TaskDialog } from "./components/TaskDialog";
@@ -302,16 +302,53 @@ export default function ProjectBoard({ params }: { params: ProjectParams }) {
                 </span>
               </div>
               <div className="space-y-4">
-                {filteredAndSortedTasks(column.tasks).map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    onDragStart={handleDragStart}
-                    onEdit={handleOpenDialog}
-                    onDelete={handleOpenDeleteDialog}
-                    aria-label={`Task: ${task.title}. Press Enter to edit or Delete to remove.`}
-                  />
-                ))}
+                {filteredAndSortedTasks(column.tasks).length === 0 ? (
+                  <div
+                    className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center animate-in fade-in-50"
+                    role="alert"
+                    aria-labelledby="no-tasks-title no-tasks-description"
+                  >
+                    <div
+                      className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10"
+                      aria-hidden="true"
+                    >
+                      <ListTodo className="h-6 w-6 text-primary" />
+                    </div>
+                    <h3
+                      id="no-tasks-title"
+                      className="mt-4 text-sm font-medium"
+                    >
+                      No tasks
+                    </h3>
+                    <p
+                      id="no-tasks-description"
+                      className="mb-4 mt-2 text-xs text-muted-foreground max-w-[160px]"
+                    >
+                      Get started by creating a new task
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => handleOpenDialog()}
+                      aria-label="Add task"
+                    >
+                      <Plus className="mr-2 h-3 w-3" aria-hidden="true" />
+                      Add Task
+                    </Button>
+                  </div>
+                ) : (
+                  filteredAndSortedTasks(column.tasks).map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      onDragStart={handleDragStart}
+                      onEdit={handleOpenDialog}
+                      onDelete={handleOpenDeleteDialog}
+                      aria-label={`Task: ${task.title}. Press Enter to edit or Delete to remove.`}
+                    />
+                  ))
+                )}
               </div>
             </div>
           ))}
