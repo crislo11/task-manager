@@ -122,81 +122,86 @@ export default function ProjectList() {
               Manage and track all your projects
             </p>
           </div>
-          <ThemeToggle aria-label="Toggle theme" />
-          <Dialog
-            open={isNewProjectDialogOpen}
-            onOpenChange={setIsNewProjectDialogOpen}
-          >
-            <DialogTrigger asChild>
-              <Button aria-label="Create new project">
-                <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
-                New Project
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Project</DialogTitle>
-                <DialogDescription>
-                  Add a new project for your team.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="title">Project Title</Label>
-                  <Input
-                    id="title"
-                    value={newProject.title}
-                    onChange={(e) =>
-                      setNewProject((prev) => ({
-                        ...prev,
-                        title: e.target.value,
-                      }))
-                    }
-                    placeholder="Enter project title"
-                    aria-label="Project title"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={newProject.description}
-                    onChange={(e) =>
-                      setNewProject((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                    placeholder="Enter project description"
-                    aria-label="Project description"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label>Members</Label>
-                  <TagInput
-                    value={newProject.members}
-                    onChange={(members) =>
-                      setNewProject((prev) => ({ ...prev, members }))
-                    }
-                    placeholder="With email of member and press Enter..."
-                    aria-label="Project members"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsNewProjectDialogOpen(false)}
-                  aria-label="Cancel creating new project"
-                >
-                  Cancel
+          <div className="flex items-center gap-4">
+            <ThemeToggle aria-label="Toggle theme" />
+            <Dialog
+              open={isNewProjectDialogOpen}
+              onOpenChange={setIsNewProjectDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button aria-label="Create new project">
+                  <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+                  New Project
                 </Button>
-                <Button onClick={handleAddProject} aria-label="Create project">
-                  Create Project
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New Project</DialogTitle>
+                  <DialogDescription>
+                    Add a new project for your team.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="title">Project Title</Label>
+                    <Input
+                      id="title"
+                      value={newProject.title}
+                      onChange={(e) =>
+                        setNewProject((prev) => ({
+                          ...prev,
+                          title: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter project title"
+                      aria-label="Project title"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={newProject.description}
+                      onChange={(e) =>
+                        setNewProject((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      placeholder="Enter project description"
+                      aria-label="Project description"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Members</Label>
+                    <TagInput
+                      value={newProject.members}
+                      onChange={(members) =>
+                        setNewProject((prev) => ({ ...prev, members }))
+                      }
+                      placeholder="With email of member and press Enter..."
+                      aria-label="Project members"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsNewProjectDialogOpen(false)}
+                    aria-label="Cancel creating new project"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleAddProject}
+                    aria-label="Create project"
+                  >
+                    Create Project
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         <div className="grid gap-4">
