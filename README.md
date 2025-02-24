@@ -59,6 +59,9 @@ task-manager/
 
 ```
 
+![diagram](https://github.com/user-attachments/assets/59fba8b0-89f2-4565-91cf-856c4bb7a15c)
+
+
 ## Key Technical Decisions
 
 **Use of Firebase:**
@@ -151,6 +154,14 @@ task-manager/
    ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser to view the task management app.
+
+### Running Tests
+
+To run tests, use the following command:
+
+```bash
+npm test
+```
 
 ## License
 
